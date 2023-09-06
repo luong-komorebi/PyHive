@@ -16,7 +16,9 @@ import unittest
 
 class TestSqlAlchemyPresto(unittest.TestCase, SqlAlchemyTestCase):
     def create_engine(self):
-        return create_engine('presto://localhost:8080/hive/default?source={}'.format(self.id()))
+        return create_engine(
+            f'presto://localhost:8080/hive/default?source={self.id()}'
+        )
 
     def test_bad_format(self):
         self.assertRaises(

@@ -41,18 +41,15 @@ _TIMESTAMP_PATTERN = re.compile(r'(\d+-\d+-\d+ \d+:\d+:\d+(\.\d{,6})?)')
 
 def _parse_timestamp(value):
     if value:
-        match = _TIMESTAMP_PATTERN.match(value)
-        if match:
-            if match.group(2):
-                format = '%Y-%m-%d %H:%M:%S.%f'
-                # use the pattern to truncate the value
-                value = match.group()
-            else:
-                format = '%Y-%m-%d %H:%M:%S'
-            value = datetime.datetime.strptime(value, format)
+        if not (match := _TIMESTAMP_PATTERN.match(value)):
+            raise Exception(f'Cannot convert "{value}" into a datetime')
+        if match.group(2):
+            format = '%Y-%m-%d %H:%M:%S.%f'
+            # use the pattern to truncate the value
+            value = match.group()
         else:
-            raise Exception(
-                'Cannot convert "{}" into a datetime'.format(value))
+            format = '%Y-%m-%d %H:%M:%S'
+        value = datetime.datetime.strptime(value, format)
     else:
         value = None
     return value
@@ -340,13 +337,9 @@ class Cursor(common.DBAPICursor):
         Return values are not defined.
         """
         # backward compatibility with Python < 3.7
-        for kw in ['async', 'async_']:
-            if kw in kwargs:
-                async_ = kwargs[kw]
-                break
-        else:
-            async_ = False
-
+        async_ = next(
+            (kwargs[kw] for kw in ['async', 'async_'] if kw in kwargs), False
+        )
         # Prepare statement
         if parameters is None:
             sql = operation
@@ -485,7 +478,7 @@ def _unwrap_column(col, type_=None):
             if converter and type_:
                 result = [converter(row) if row else row for row in result]
             return result
-    raise DataError("Got empty column value {}".format(col))  # pragma: no cover
+    raise DataError(f"Got empty column value {col}")
 
 
 def _check_status(response):

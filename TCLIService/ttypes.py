@@ -444,18 +444,12 @@ class TTypeQualifierValue(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I32:
-                    self.i32Value = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.stringValue = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.I32:
+                self.i32Value = iprot.readI32()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.stringValue = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -481,7 +475,7 @@ class TTypeQualifierValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -513,18 +507,15 @@ class TTypeQualifiers(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.MAP:
-                    self.qualifiers = {}
-                    (_ktype1, _vtype2, _size0) = iprot.readMapBegin()
-                    for _i4 in range(_size0):
-                        _key5 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        _val6 = TTypeQualifierValue()
-                        _val6.read(iprot)
-                        self.qualifiers[_key5] = _val6
-                    iprot.readMapEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.MAP:
+                self.qualifiers = {}
+                (_ktype1, _vtype2, _size0) = iprot.readMapBegin()
+                for _i4 in range(_size0):
+                    _key5 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                    _val6 = TTypeQualifierValue()
+                    _val6.read(iprot)
+                    self.qualifiers[_key5] = _val6
+                iprot.readMapEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -554,7 +545,7 @@ class TTypeQualifiers(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -589,19 +580,13 @@ class TPrimitiveTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I32:
-                    self.type = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.typeQualifiers = TTypeQualifiers()
-                    self.typeQualifiers.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.I32:
+                self.type = iprot.readI32()
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.typeQualifiers = TTypeQualifiers()
+                self.typeQualifiers.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -629,7 +614,7 @@ class TPrimitiveTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -661,11 +646,8 @@ class TArrayTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I32:
-                    self.objectTypePtr = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.I32:
+                self.objectTypePtr = iprot.readI32()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -691,7 +673,7 @@ class TArrayTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -726,18 +708,12 @@ class TMapTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I32:
-                    self.keyTypePtr = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I32:
-                    self.valueTypePtr = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.I32:
+                self.keyTypePtr = iprot.readI32()
+            elif fid == 1 or fid == 2 and ftype != TType.I32 or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.valueTypePtr = iprot.readI32()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -767,7 +743,7 @@ class TMapTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -799,17 +775,14 @@ class TStructTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.MAP:
-                    self.nameToTypePtr = {}
-                    (_ktype10, _vtype11, _size9) = iprot.readMapBegin()
-                    for _i13 in range(_size9):
-                        _key14 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        _val15 = iprot.readI32()
-                        self.nameToTypePtr[_key14] = _val15
-                    iprot.readMapEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.MAP:
+                self.nameToTypePtr = {}
+                (_ktype10, _vtype11, _size9) = iprot.readMapBegin()
+                for _i13 in range(_size9):
+                    _key14 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                    _val15 = iprot.readI32()
+                    self.nameToTypePtr[_key14] = _val15
+                iprot.readMapEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -839,7 +812,7 @@ class TStructTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -871,17 +844,14 @@ class TUnionTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.MAP:
-                    self.nameToTypePtr = {}
-                    (_ktype19, _vtype20, _size18) = iprot.readMapBegin()
-                    for _i22 in range(_size18):
-                        _key23 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        _val24 = iprot.readI32()
-                        self.nameToTypePtr[_key23] = _val24
-                    iprot.readMapEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.MAP:
+                self.nameToTypePtr = {}
+                (_ktype19, _vtype20, _size18) = iprot.readMapBegin()
+                for _i22 in range(_size18):
+                    _key23 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                    _val24 = iprot.readI32()
+                    self.nameToTypePtr[_key23] = _val24
+                iprot.readMapEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -911,7 +881,7 @@ class TUnionTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -943,11 +913,8 @@ class TUserDefinedTypeEntry(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.typeClassName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRING:
+                self.typeClassName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -973,7 +940,7 @@ class TUserDefinedTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1099,7 +1066,7 @@ class TTypeEntry(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1131,17 +1098,14 @@ class TTypeDesc(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.types = []
-                    (_etype30, _size27) = iprot.readListBegin()
-                    for _i31 in range(_size27):
-                        _elem32 = TTypeEntry()
-                        _elem32.read(iprot)
-                        self.types.append(_elem32)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.LIST:
+                self.types = []
+                (_etype30, _size27) = iprot.readListBegin()
+                for _i31 in range(_size27):
+                    _elem32 = TTypeEntry()
+                    _elem32.read(iprot)
+                    self.types.append(_elem32)
+                iprot.readListEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1170,7 +1134,7 @@ class TTypeDesc(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1273,7 +1237,7 @@ class TColumnDesc(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1305,17 +1269,14 @@ class TTableSchema(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.columns = []
-                    (_etype37, _size34) = iprot.readListBegin()
-                    for _i38 in range(_size34):
-                        _elem39 = TColumnDesc()
-                        _elem39.read(iprot)
-                        self.columns.append(_elem39)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.LIST:
+                self.columns = []
+                (_etype37, _size34) = iprot.readListBegin()
+                for _i38 in range(_size34):
+                    _elem39 = TColumnDesc()
+                    _elem39.read(iprot)
+                    self.columns.append(_elem39)
+                iprot.readListEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1344,7 +1305,7 @@ class TTableSchema(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1376,11 +1337,8 @@ class TBoolValue(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.BOOL:
-                    self.value = iprot.readBool()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.BOOL:
+                self.value = iprot.readBool()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1404,7 +1362,7 @@ class TBoolValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1436,11 +1394,8 @@ class TByteValue(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.BYTE:
-                    self.value = iprot.readByte()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.BYTE:
+                self.value = iprot.readByte()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1464,7 +1419,7 @@ class TByteValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1496,11 +1451,8 @@ class TI16Value(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I16:
-                    self.value = iprot.readI16()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.I16:
+                self.value = iprot.readI16()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1524,7 +1476,7 @@ class TI16Value(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1556,11 +1508,8 @@ class TI32Value(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I32:
-                    self.value = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.I32:
+                self.value = iprot.readI32()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1584,7 +1533,7 @@ class TI32Value(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1616,11 +1565,8 @@ class TI64Value(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.I64:
-                    self.value = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.I64:
+                self.value = iprot.readI64()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1644,7 +1590,7 @@ class TI64Value(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1676,11 +1622,8 @@ class TDoubleValue(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.DOUBLE:
-                    self.value = iprot.readDouble()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.DOUBLE:
+                self.value = iprot.readDouble()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1704,7 +1647,7 @@ class TDoubleValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1736,11 +1679,8 @@ class TStringValue(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.value = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRING:
+                self.value = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1764,7 +1704,7 @@ class TStringValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1903,7 +1843,7 @@ class TColumnValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -1935,17 +1875,14 @@ class TRow(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.colVals = []
-                    (_etype44, _size41) = iprot.readListBegin()
-                    for _i45 in range(_size41):
-                        _elem46 = TColumnValue()
-                        _elem46.read(iprot)
-                        self.colVals.append(_elem46)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.LIST:
+                self.colVals = []
+                (_etype44, _size41) = iprot.readListBegin()
+                for _i45 in range(_size41):
+                    _elem46 = TColumnValue()
+                    _elem46.read(iprot)
+                    self.colVals.append(_elem46)
+                iprot.readListEnd()
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -1974,7 +1911,7 @@ class TRow(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2009,23 +1946,17 @@ class TBoolColumn(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype51, _size48) = iprot.readListBegin()
-                    for _i52 in range(_size48):
-                        _elem53 = iprot.readBool()
-                        self.values.append(_elem53)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype51, _size48) = iprot.readListBegin()
+                for _i52 in range(_size48):
+                    _elem53 = iprot.readBool()
+                    self.values.append(_elem53)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2058,7 +1989,7 @@ class TBoolColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2093,23 +2024,17 @@ class TByteColumn(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype58, _size55) = iprot.readListBegin()
-                    for _i59 in range(_size55):
-                        _elem60 = iprot.readByte()
-                        self.values.append(_elem60)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype58, _size55) = iprot.readListBegin()
+                for _i59 in range(_size55):
+                    _elem60 = iprot.readByte()
+                    self.values.append(_elem60)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2142,7 +2067,7 @@ class TByteColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2177,23 +2102,17 @@ class TI16Column(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype65, _size62) = iprot.readListBegin()
-                    for _i66 in range(_size62):
-                        _elem67 = iprot.readI16()
-                        self.values.append(_elem67)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype65, _size62) = iprot.readListBegin()
+                for _i66 in range(_size62):
+                    _elem67 = iprot.readI16()
+                    self.values.append(_elem67)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2226,7 +2145,7 @@ class TI16Column(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2261,23 +2180,17 @@ class TI32Column(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype72, _size69) = iprot.readListBegin()
-                    for _i73 in range(_size69):
-                        _elem74 = iprot.readI32()
-                        self.values.append(_elem74)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype72, _size69) = iprot.readListBegin()
+                for _i73 in range(_size69):
+                    _elem74 = iprot.readI32()
+                    self.values.append(_elem74)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2310,7 +2223,7 @@ class TI32Column(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2345,23 +2258,17 @@ class TI64Column(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype79, _size76) = iprot.readListBegin()
-                    for _i80 in range(_size76):
-                        _elem81 = iprot.readI64()
-                        self.values.append(_elem81)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype79, _size76) = iprot.readListBegin()
+                for _i80 in range(_size76):
+                    _elem81 = iprot.readI64()
+                    self.values.append(_elem81)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2394,7 +2301,7 @@ class TI64Column(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2429,23 +2336,17 @@ class TDoubleColumn(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype86, _size83) = iprot.readListBegin()
-                    for _i87 in range(_size83):
-                        _elem88 = iprot.readDouble()
-                        self.values.append(_elem88)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype86, _size83) = iprot.readListBegin()
+                for _i87 in range(_size83):
+                    _elem88 = iprot.readDouble()
+                    self.values.append(_elem88)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2478,7 +2379,7 @@ class TDoubleColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2513,23 +2414,17 @@ class TStringColumn(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype93, _size90) = iprot.readListBegin()
-                    for _i94 in range(_size90):
-                        _elem95 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        self.values.append(_elem95)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype93, _size90) = iprot.readListBegin()
+                for _i94 in range(_size90):
+                    _elem95 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                    self.values.append(_elem95)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2562,7 +2457,7 @@ class TStringColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2597,23 +2492,17 @@ class TBinaryColumn(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.values = []
-                    (_etype100, _size97) = iprot.readListBegin()
-                    for _i101 in range(_size97):
-                        _elem102 = iprot.readBinary()
-                        self.values.append(_elem102)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.nulls = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.LIST:
+                self.values = []
+                (_etype100, _size97) = iprot.readListBegin()
+                for _i101 in range(_size97):
+                    _elem102 = iprot.readBinary()
+                    self.values.append(_elem102)
+                iprot.readListEnd()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.nulls = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -2646,7 +2535,7 @@ class TBinaryColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2798,7 +2687,7 @@ class TColumn(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -2928,7 +2817,7 @@ class TRowSet(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3046,7 +2935,7 @@ class TStatus(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3081,18 +2970,12 @@ class THandleIdentifier(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.guid = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.secret = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRING:
+                self.guid = iprot.readBinary()
+            elif fid == 1 or fid == 2 and ftype != TType.STRING or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.secret = iprot.readBinary()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -3122,7 +3005,7 @@ class THandleIdentifier(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3154,12 +3037,9 @@ class TSessionHandle(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionId = THandleIdentifier()
-                    self.sessionId.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionId = THandleIdentifier()
+                self.sessionId.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -3185,7 +3065,7 @@ class TSessionHandle(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3288,7 +3168,7 @@ class TOperationHandle(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3396,7 +3276,7 @@ class TOpenSessionReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3508,7 +3388,7 @@ class TOpenSessionResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3540,12 +3420,9 @@ class TCloseSessionReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionHandle = TSessionHandle()
+                self.sessionHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -3571,7 +3448,7 @@ class TCloseSessionReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3603,12 +3480,9 @@ class TCloseSessionResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -3634,7 +3508,7 @@ class TCloseSessionResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3754,7 +3628,7 @@ class TGetInfoValue(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3789,19 +3663,13 @@ class TGetInfoReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.I32:
-                    self.infoType = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionHandle = TSessionHandle()
+                self.sessionHandle.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.I32 or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.infoType = iprot.readI32()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -3831,7 +3699,7 @@ class TGetInfoReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -3866,20 +3734,14 @@ class TGetInfoResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.infoValue = TGetInfoValue()
-                    self.infoValue.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.infoValue = TGetInfoValue()
+                self.infoValue.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -3909,7 +3771,7 @@ class TGetInfoResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4032,7 +3894,7 @@ class TExecuteStatementReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4067,20 +3929,14 @@ class TExecuteStatementResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4108,7 +3964,7 @@ class TExecuteStatementResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4140,12 +3996,9 @@ class TGetTypeInfoReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionHandle = TSessionHandle()
+                self.sessionHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -4171,7 +4024,7 @@ class TGetTypeInfoReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4206,20 +4059,14 @@ class TGetTypeInfoResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4247,7 +4094,7 @@ class TGetTypeInfoResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4279,12 +4126,9 @@ class TGetCatalogsReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionHandle = TSessionHandle()
+                self.sessionHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -4310,7 +4154,7 @@ class TGetCatalogsReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4345,20 +4189,14 @@ class TGetCatalogsResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4386,7 +4224,7 @@ class TGetCatalogsResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4473,7 +4311,7 @@ class TGetSchemasReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4508,20 +4346,14 @@ class TGetSchemasResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4549,7 +4381,7 @@ class TGetSchemasResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4668,7 +4500,7 @@ class TGetTablesReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4703,20 +4535,14 @@ class TGetTablesResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4744,7 +4570,7 @@ class TGetTablesResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4776,12 +4602,9 @@ class TGetTableTypesReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.sessionHandle = TSessionHandle()
+                self.sessionHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -4807,7 +4630,7 @@ class TGetTableTypesReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4842,20 +4665,14 @@ class TGetTableTypesResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -4883,7 +4700,7 @@ class TGetTableTypesResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -4994,7 +4811,7 @@ class TGetColumnsReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5029,20 +4846,14 @@ class TGetColumnsResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -5070,7 +4881,7 @@ class TGetColumnsResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5171,7 +4982,7 @@ class TGetFunctionsReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5206,20 +5017,14 @@ class TGetFunctionsResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -5247,7 +5052,7 @@ class TGetFunctionsResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5346,7 +5151,7 @@ class TGetPrimaryKeysReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5381,20 +5186,14 @@ class TGetPrimaryKeysResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -5422,7 +5221,7 @@ class TGetPrimaryKeysResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5557,7 +5356,7 @@ class TGetCrossReferenceReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5592,20 +5391,14 @@ class TGetCrossReferenceResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -5633,7 +5426,7 @@ class TGetCrossReferenceResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5788,7 +5581,7 @@ class TProgressUpdateResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -5822,19 +5615,13 @@ class TGetOperationStatusReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.BOOL:
-                    self.getProgressUpdate = iprot.readBool()
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.BOOL or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.getProgressUpdate = iprot.readBool()
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -5862,7 +5649,7 @@ class TGetOperationStatusReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6034,7 +5821,7 @@ class TGetOperationStatusResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6066,12 +5853,9 @@ class TCancelOperationReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -6097,7 +5881,7 @@ class TCancelOperationReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6129,12 +5913,9 @@ class TCancelOperationResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -6160,7 +5941,7 @@ class TCancelOperationResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6192,12 +5973,9 @@ class TCloseOperationReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -6223,7 +6001,7 @@ class TCloseOperationReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6255,12 +6033,9 @@ class TCloseOperationResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -6286,7 +6061,7 @@ class TCloseOperationResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6318,12 +6093,9 @@ class TGetResultSetMetadataReq(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
+            if fid == 1 and ftype == TType.STRUCT:
+                self.operationHandle = TOperationHandle()
+                self.operationHandle.read(iprot)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -6349,7 +6121,7 @@ class TGetResultSetMetadataReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6384,20 +6156,14 @@ class TGetResultSetMetadataResp(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.schema = TTableSchema()
-                    self.schema.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
+            if fid == 1 and ftype == TType.STRUCT:
+                self.status = TStatus()
+                self.status.read(iprot)
+            elif fid == 1 or fid == 2 and ftype != TType.STRUCT or fid != 2:
                 iprot.skip(ftype)
+            else:
+                self.schema = TTableSchema()
+                self.schema.read(iprot)
             iprot.readFieldEnd()
         iprot.readStructEnd()
 
@@ -6425,7 +6191,7 @@ class TGetResultSetMetadataResp(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
@@ -6528,7 +6294,7 @@ class TFetchResultsReq(object):
     def __repr__(self):
         L = ['%s=%r' % (key, value)
              for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+        return f"{self.__class__.__name__}({', '.join(L)})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__

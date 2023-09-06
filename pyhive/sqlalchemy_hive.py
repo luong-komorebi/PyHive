@@ -88,10 +88,7 @@ class HiveDecimal(HiveStringTypeBase):
     impl = types.DECIMAL
 
     def process_result_value(self, value, dialect):
-        if value is not None:
-            return decimal.Decimal(value)
-        else:
-            return None
+        return decimal.Decimal(value) if value is not None else None
 
     def result_processor(self, dialect, coltype):
         def process(value):
@@ -143,7 +140,7 @@ _type_map = {
 
 class HiveCompiler(SQLCompiler):
     def visit_concat_op_binary(self, binary, operator, **kw):
-        return "concat(%s, %s)" % (self.process(binary.left), self.process(binary.right))
+        return f"concat({self.process(binary.left)}, {self.process(binary.right)})"
 
     def visit_insert(self, *args, **kwargs):
         result = super(HiveCompiler, self).visit_insert(*args, **kwargs)
@@ -152,13 +149,13 @@ class HiveCompiler(SQLCompiler):
         #   =>
         #   INSERT INTO TABLE `pyhive_test_database`.`test_table` SELECT ...
         regex = r'^(INSERT INTO) ([^\s]+) \([^\)]*\)'
-        assert re.search(regex, result), "Unexpected visit_insert result: {}".format(result)
+        assert re.search(regex, result), f"Unexpected visit_insert result: {result}"
         return re.sub(regex, r'\1 TABLE \2', result)
 
     def visit_column(self, *args, **kwargs):
         result = super(HiveCompiler, self).visit_column(*args, **kwargs)
         dot_count = result.count('.')
-        assert dot_count in (0, 1, 2), "Unexpected visit_column result {}".format(result)
+        assert dot_count in (0, 1, 2), f"Unexpected visit_column result {result}"
         if dot_count == 2:
             # we have something of the form schema.table.column
             # hive doesn't like the schema in front, so chop it out
@@ -260,7 +257,7 @@ class HiveDialect(default.DefaultDialect):
             'password': url.password,
             'database': url.database or 'default',
         }
-        kwargs.update(url.query)
+        kwargs |= url.query
         return [], kwargs
 
     def get_schema_names(self, connection, **kw):
@@ -275,12 +272,12 @@ class HiveDialect(default.DefaultDialect):
     def _get_table_columns(self, connection, table_name, schema):
         full_table = table_name
         if schema:
-            full_table = schema + '.' + table_name
+            full_table = f'{schema}.{table_name}'
         # TODO using TGetColumnsReq hangs after sending TFetchResultsReq.
         # Using DESCRIBE works but is uglier.
         try:
             # This needs the table name to be unescaped (no backticks).
-            rows = connection.execute('DESCRIBE {}'.format(full_table)).fetchall()
+            rows = connection.execute(f'DESCRIBE {full_table}').fetchall()
         except exc.OperationalError as e:
             # Does the table exist?
             regex_fmt = r'TExecuteStatementResp.*SemanticException.*Table not found {}'
@@ -320,7 +317,7 @@ class HiveDialect(default.DefaultDialect):
             try:
                 coltype = _type_map[col_type]
             except KeyError:
-                util.warn("Did not recognize type '%s' of column '%s'" % (col_type, col_name))
+                util.warn(f"Did not recognize type '{col_type}' of column '{col_name}'")
                 coltype = types.NullType
 
             result.append({
@@ -348,11 +345,9 @@ class HiveDialect(default.DefaultDialect):
         for i, (col_name, _col_type, _comment) in enumerate(rows):
             if col_name == '# Partition Information':
                 break
-        # Handle partition columns
-        col_names = []
-        for col_name, _col_type, _comment in rows[i + 1:]:
-            col_names.append(col_name)
-        if col_names:
+        if col_names := [
+            col_name for col_name, _col_type, _comment in rows[i + 1 :]
+        ]:
             return [{'name': 'partition', 'column_names': col_names, 'unique': False}]
         else:
             return []
@@ -360,7 +355,7 @@ class HiveDialect(default.DefaultDialect):
     def get_table_names(self, connection, schema=None, **kw):
         query = 'SHOW TABLES'
         if schema:
-            query += ' IN ' + self.identifier_preparer.quote_identifier(schema)
+            query += f' IN {self.identifier_preparer.quote_identifier(schema)}'
         return [row[0] for row in connection.execute(query)]
 
     def do_rollback(self, dbapi_connection):
