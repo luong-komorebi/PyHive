@@ -154,12 +154,17 @@ class TestSqlAlchemyHive(unittest.TestCase, SqlAlchemyTestCase):
             'Numeric', 'Float', 'DateTime', 'Date', 'Time', 'LargeBinary',
             'Boolean', 'Unicode', 'UnicodeText',
         ]
-        cols = []
-        for i, t in enumerate(types):
-            cols.append(Column(str(i), getattr(sqlalchemy.types, t)))
-        cols.append(Column('hive_date', HiveDate))
-        cols.append(Column('hive_decimal', HiveDecimal))
-        cols.append(Column('hive_timestamp', HiveTimestamp))
+        cols = [
+            Column(str(i), getattr(sqlalchemy.types, t))
+            for i, t in enumerate(types)
+        ]
+        cols.extend(
+            (
+                Column('hive_date', HiveDate),
+                Column('hive_decimal', HiveDecimal),
+                Column('hive_timestamp', HiveTimestamp),
+            )
+        )
         table = Table('test_table', MetaData(bind=engine), *cols, schema='pyhive_test_database')
         table.drop(checkfirst=True)
         table.create()

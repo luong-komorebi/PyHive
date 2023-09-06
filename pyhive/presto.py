@@ -39,7 +39,7 @@ class PrestoParamEscaper(common.ParamEscaper):
     def escape_datetime(self, item, format):
         _type = "timestamp" if isinstance(item, datetime.datetime) else "date"
         formatted = super(PrestoParamEscaper, self).escape_datetime(item, format, 3)
-        return "{} {}".format(_type, formatted)
+        return f"{_type} {formatted}"
 
 
 _escaper = PrestoParamEscaper()
@@ -170,7 +170,7 @@ class Cursor(common.DBAPICursor):
 
             hostname_override = None
             if KerberosUseCanonicalHostname is not None \
-                    and KerberosUseCanonicalHostname.lower() == 'false':
+                        and KerberosUseCanonicalHostname.lower() == 'false':
                 hostname_override = host
             if KerberosConfigPath is not None:
                 os.environ['KRB5_CONFIG'] = KerberosConfigPath
@@ -189,7 +189,7 @@ class Cursor(common.DBAPICursor):
                 raise ValueError("Cannot use both password and requests_kwargs authentication")
             for k in ('method', 'url', 'data', 'headers'):
                 if k in requests_kwargs:
-                    raise ValueError("Cannot override requests argument {}".format(k))
+                    raise ValueError(f"Cannot override requests argument {k}")
             if password is not None:
                 requests_kwargs['auth'] = HTTPBasicAuth(username, password)
         self._requests_kwargs = requests_kwargs
@@ -246,7 +246,7 @@ class Cursor(common.DBAPICursor):
 
         if self._session_props:
             headers['X-Presto-Session'] = ','.join(
-                '{}={}'.format(propname, propval)
+                f'{propname}={propval}'
                 for propname, propval in self._session_props.items()
             )
 
@@ -259,9 +259,16 @@ class Cursor(common.DBAPICursor):
         self._reset_state()
 
         self._state = self._STATE_RUNNING
-        url = urlparse.urlunparse((
-            self._protocol,
-            '{}:{}'.format(self._host, self._port), '/v1/statement', None, None, None))
+        url = urlparse.urlunparse(
+            (
+                self._protocol,
+                f'{self._host}:{self._port}',
+                '/v1/statement',
+                None,
+                None,
+                None,
+            )
+        )
         _logger.info('%s', sql)
         _logger.debug("Headers: %s", headers)
         response = self._requests_session.post(

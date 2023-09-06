@@ -61,10 +61,7 @@ class PrestoTypeCompiler(compiler.GenericTypeCompiler):
         return 'DOUBLE'
 
     def visit_TEXT(self, type_, **kw):
-        if type_.length:
-            return 'VARCHAR({:d})'.format(type_.length)
-        else:
-            return 'VARCHAR'
+        return 'VARCHAR({:d})'.format(type_.length) if type_.length else 'VARCHAR'
 
 
 class PrestoDialect(default.DefaultDialect):
@@ -97,14 +94,14 @@ class PrestoDialect(default.DefaultDialect):
             'username': url.username,
             'password': url.password
         }
-        kwargs.update(url.query)
+        kwargs |= url.query
         if len(db_parts) == 1:
             kwargs['catalog'] = db_parts[0]
         elif len(db_parts) == 2:
             kwargs['catalog'] = db_parts[0]
             kwargs['schema'] = db_parts[1]
         else:
-            raise ValueError("Unexpected database format {}".format(url.database))
+            raise ValueError(f"Unexpected database format {url.database}")
         return [], kwargs
 
     def get_schema_names(self, connection, **kw):
@@ -113,9 +110,11 @@ class PrestoDialect(default.DefaultDialect):
     def _get_table_columns(self, connection, table_name, schema):
         full_table = self.identifier_preparer.quote_identifier(table_name)
         if schema:
-            full_table = self.identifier_preparer.quote_identifier(schema) + '.' + full_table
+            full_table = (
+                f'{self.identifier_preparer.quote_identifier(schema)}.{full_table}'
+            )
         try:
-            return connection.execute('SHOW COLUMNS FROM {}'.format(full_table))
+            return connection.execute(f'SHOW COLUMNS FROM {full_table}')
         except (presto.DatabaseError, exc.DatabaseError) as e:
             # Normally SQLAlchemy should wrap this exception in sqlalchemy.exc.DatabaseError, which
             # it successfully does in the Hive version. The difference with Presto is that this
@@ -128,7 +127,7 @@ class PrestoDialect(default.DefaultDialect):
                 else e.args[0] if e.args and isinstance(e.args[0], str)
                 else None
             )
-            regex = r"Table\ \'.*{}\'\ does\ not\ exist".format(re.escape(table_name))
+            regex = f"Table\ \'.*{re.escape(table_name)}\'\ does\ not\ exist"
             if msg and re.search(regex, msg):
                 raise exc.NoSuchTableError(table_name)
             else:
@@ -148,7 +147,7 @@ class PrestoDialect(default.DefaultDialect):
             try:
                 coltype = _type_map[row.Type]
             except KeyError:
-                util.warn("Did not recognize type '%s' of column '%s'" % (row.Type, row.Column))
+                util.warn(f"Did not recognize type '{row.Type}' of column '{row.Column}'")
                 coltype = types.NullType
             result.append({
                 'name': row.Column,
@@ -170,18 +169,13 @@ class PrestoDialect(default.DefaultDialect):
     def get_indexes(self, connection, table_name, schema=None, **kw):
         rows = self._get_table_columns(connection, table_name, schema)
         col_names = []
+        part_key = 'Partition Key'
         for row in rows:
-            part_key = 'Partition Key'
-            # Presto puts this information in one of 3 places depending on version
-            # - a boolean column named "Partition Key"
-            # - a string in the "Comment" column
-            # - a string in the "Extra" column
-            is_partition_key = (
+            if is_partition_key := (
                 (part_key in row and row[part_key])
                 or row['Comment'].startswith(part_key)
                 or ('Extra' in row and 'partition key' in row['Extra'])
-            )
-            if is_partition_key:
+            ):
                 col_names.append(row['Column'])
         if col_names:
             return [{'name': 'partition', 'column_names': col_names, 'unique': False}]
@@ -191,7 +185,7 @@ class PrestoDialect(default.DefaultDialect):
     def get_table_names(self, connection, schema=None, **kw):
         query = 'SHOW TABLES'
         if schema:
-            query += ' FROM ' + self.identifier_preparer.quote_identifier(schema)
+            query += f' FROM {self.identifier_preparer.quote_identifier(schema)}'
         return [row.Table for row in connection.execute(query)]
 
     def do_rollback(self, dbapi_connection):

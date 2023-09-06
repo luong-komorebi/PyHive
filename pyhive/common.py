@@ -107,9 +107,8 @@ class DBAPICursor(with_metaclass(abc.ABCMeta, object)):
 
         if not self._data:
             return None
-        else:
-            self._rownumber += 1
-            return self._data.popleft()
+        self._rownumber += 1
+        return self._data.popleft()
 
     def fetchmany(self, size=None):
         """Fetch the next set of rows of a query result, returning a sequence of sequences (e.g. a
@@ -195,10 +194,7 @@ class DBAPITypeObject(object):
     def __cmp__(self, other):
         if other in self.values:
             return 0
-        if other < self.values:
-            return 1
-        else:
-            return -1
+        return 1 if other < self.values else -1
 
 
 class ParamEscaper(object):
@@ -212,7 +208,7 @@ class ParamEscaper(object):
         elif isinstance(parameters, (list, tuple)):
             return tuple(self.escape_item(x) for x in parameters)
         else:
-            raise exc.ProgrammingError("Unsupported param format: {}".format(parameters))
+            raise exc.ProgrammingError(f"Unsupported param format: {parameters}")
 
     def escape_number(self, item):
         return item
@@ -227,7 +223,7 @@ class ParamEscaper(object):
         # This is good enough when backslashes are literal, newlines are just followed, and the way
         # to escape a single quote is to put two single quotes.
         # (i.e. only special character is single quote)
-        return "'{}'".format(item.replace("'", "''"))
+        return f"""'{item.replace("'", "''")}'"""
 
     def escape_sequence(self, item):
         l = map(str, map(self.escape_item, item))
@@ -236,7 +232,7 @@ class ParamEscaper(object):
     def escape_datetime(self, item, format, cutoff=0):
         dt_str = item.strftime(format)
         formatted = dt_str[:-cutoff] if cutoff and format.endswith(".%f") else dt_str
-        return "'{}'".format(formatted)
+        return f"'{formatted}'"
 
     def escape_item(self, item):
         if item is None:
@@ -252,7 +248,7 @@ class ParamEscaper(object):
         elif isinstance(item, datetime.date):
             return self.escape_datetime(item, self._DATE_FORMAT)
         else:
-            raise exc.ProgrammingError("Unsupported object {}".format(item))
+            raise exc.ProgrammingError(f"Unsupported object {item}")
 
 
 class UniversalSet(object):

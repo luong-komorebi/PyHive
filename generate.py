@@ -39,14 +39,11 @@ def main(hive_server2_url):
     hive_server2_path = path.join(here, hive_server2_url.rsplit('/', 1)[-1])
 
     subprocess.call(['thrift', '-r', '--gen', 'py', hive_server2_path])
-    shutil.move(path.join(here, PACKAGE), path.join(here, PACKAGE + '.old'))
+    shutil.move(path.join(here, PACKAGE), path.join(here, f'{PACKAGE}.old'))
     shutil.move(path.join(here, GENERATED, PACKAGE), path.join(here, PACKAGE))
-    shutil.rmtree(path.join(here, PACKAGE + '.old'))
+    shutil.rmtree(path.join(here, f'{PACKAGE}.old'))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        url = sys.argv[1]
-    else:
-        url = HIVE_SERVER2_URL
+    url = sys.argv[1] if len(sys.argv) > 1 else HIVE_SERVER2_URL
     main(url)
